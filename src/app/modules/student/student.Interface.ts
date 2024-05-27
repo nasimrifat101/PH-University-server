@@ -23,7 +23,7 @@ export type UserName={
     lastName: string;
 }
 
-export type student = {
+export type Student = {
     id: string;
     name: UserName;
     gender: 'male' | "female";
