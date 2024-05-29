@@ -39,7 +39,6 @@ const studentSchema = new Schema<TStudent>({
   password: {
     type: String,
     required: true,
-    unique: true,
     maxlength: [20, "password cannot be more than 20 characters long"],
   },
   name: {
@@ -81,14 +80,19 @@ const studentSchema = new Schema<TStudent>({
 studentSchema.pre("save", async function (next) {
   const user = this;
   if (user.isModified("password") || user.isNew) {
-    user.password = await bcrypt.hash(user.password, Number(config.bcrypt_salt_rounds));
+    user.password = await bcrypt.hash(
+      user.password,
+      Number(config.bcrypt_salt_rounds)
+    );
   }
   next();
 });
 
 // post save middleware
-studentSchema.post("save", function () {
-  console.log(this, "post hook: we saved our data");
+studentSchema.post("save", function (doc, next) {
+  // console.log("post hook: we saved our data");
+  doc.password = "";
+  next();
 });
 
 export const Student = model<TStudent>("Student", studentSchema);
