@@ -1,18 +1,23 @@
-import { Schema, model, connect } from "mongoose";
+import { Schema, model } from "mongoose";
+import bcrypt from "bcrypt";
+import config from "../../config";
 import {
-  Guardian,
-  LocalGuardian,
-  UserName,
-  Student,
+  TGuardian,
+  TLocalGuardian,
+  TUserName,
+  TStudent,
 } from "./student.Interface";
 
-const userNameSchema = new Schema<UserName>({
+const userNameSchema = new Schema<TUserName>({
   firstName: { type: String, required: true },
   middleName: { type: String },
-  lastName: { type: String, required: true },
+  lastName: {
+    type: String,
+    required: true,
+  },
 });
 
-const guardianSchema = new Schema<Guardian>({
+const guardianSchema = new Schema<TGuardian>({
   fatherName: { type: String, required: true },
   fatherOccupation: { type: String, required: true },
   fatherContactNumber: { type: String, required: true },
@@ -22,15 +27,21 @@ const guardianSchema = new Schema<Guardian>({
   address: { type: String, required: true },
 });
 
-const localGuardianSchema = new Schema<LocalGuardian>({
+const localGuardianSchema = new Schema<TLocalGuardian>({
   name: { type: String, required: true },
   occupation: { type: String, required: true },
   contactNumber: { type: String, required: true },
   address: { type: String, required: true },
 });
 
-const studentSchema = new Schema<Student>({
-  id: { type: String, required: true },
+const studentSchema = new Schema<TStudent>({
+  id: { type: String, required: true, unique: true },
+  password: {
+    type: String,
+    required: true,
+    unique: true,
+    maxlength: [20, "password cannot be more than 20 characters long"],
+  },
   name: {
     type: userNameSchema,
     required: true,
@@ -41,7 +52,7 @@ const studentSchema = new Schema<Student>({
     required: true,
   },
   dateOfBirth: { type: String },
-  email: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
   contactNumber: { type: String, required: true },
   emergencyContactNumber: { type: String, required: true },
   presentAddress: { type: String, required: true },
@@ -66,4 +77,18 @@ const studentSchema = new Schema<Student>({
   },
 });
 
-export const StudentModel = model<Student>("Student", studentSchema);
+// pre save middleware
+studentSchema.pre("save", async function (next) {
+  const user = this;
+  if (user.isModified("password") || user.isNew) {
+    user.password = await bcrypt.hash(user.password, Number(config.bcrypt_salt_rounds));
+  }
+  next();
+});
+
+// post save middleware
+studentSchema.post("save", function () {
+  console.log(this, "post hook: we saved our data");
+});
+
+export const Student = model<TStudent>("Student", studentSchema);
