@@ -4,7 +4,6 @@ import Joi from "joi";
 
 const createStudent = async (req: Request, res: Response) => {
   try {
-    
     const { student } = req.body;
     const result = await studentServices.createStudentIntoDB(student);
     res.status(200).json({
@@ -12,8 +11,12 @@ const createStudent = async (req: Request, res: Response) => {
       message: "Student created successfully",
       data: result,
     });
-  } catch (err) {
-    console.log(err);
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message || "Student create failed",
+      data: err,
+    });
   }
 };
 
@@ -25,8 +28,12 @@ const getAllStudents = async (req: Request, res: Response) => {
       message: "Students retrieved successfully",
       data: result,
     });
-  } catch (err) {
-    console.log(err);
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message || "Student retrieve failed",
+      data: err,
+    });
   }
 };
 
@@ -39,8 +46,12 @@ const getSingleStudent = async (req: Request, res: Response) => {
       message: `Student with id ${studentId} retrieved successfully`,
       data: result,
     });
-  } catch (err) {
-    console.log(err);
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message || "Student retrieve failed",
+      data: err,
+    });
   }
 };
 

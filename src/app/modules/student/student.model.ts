@@ -95,4 +95,12 @@ studentSchema.post("save", function (doc, next) {
   next();
 });
 
+// query middleware
+
+studentSchema.pre('find', function(next){
+  
+
+  next()
+})
+
 export const Student = model<TStudent>("Student", studentSchema);
