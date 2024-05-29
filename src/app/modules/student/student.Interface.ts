@@ -39,10 +39,15 @@ export type TStudent = {
   localGuardian: TLocalGuardian;
   profileImg?: string;
   isActive: "active" | "block";
+  isDeleted: boolean;
 };
 
 export type studentMethod = {
   isUserExist(id: string): Promise<TStudent>;
 };
 
-export type studentModel = Model<TStudent, Record<string, never>, studentMethod>;
+export type studentModel = Model<
+  TStudent,
+  Record<string, never>,
+  studentMethod
+>;

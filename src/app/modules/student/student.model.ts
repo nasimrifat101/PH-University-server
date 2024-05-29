@@ -74,6 +74,10 @@ const studentSchema = new Schema<TStudent>({
     enum: ["active", "block"],
     default: "active",
   },
+  isDeleted: {
+    type: Boolean,
+    default: false
+  }
 });
 
 // pre save middleware
