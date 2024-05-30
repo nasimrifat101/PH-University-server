@@ -2,23 +2,7 @@ import { Request, Response } from "express";
 import { studentServices } from "./student.service";
 
 
-const createStudent = async (req: Request, res: Response) => {
-  try {
-    const { student } = req.body;
-    const result = await studentServices.createStudentIntoDB(student);
-    res.status(200).json({
-      success: true,
-      message: "Student created successfully",
-      data: result,
-    });
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message || "Student create failed",
-      data: err,
-    });
-  }
-};
+
 
 const getAllStudents = async (req: Request, res: Response) => {
   try {
@@ -74,7 +58,6 @@ const deleteStudent = async (req: Request, res: Response) => {
 };
 
 export const studentController = {
-  createStudent,
   getAllStudents,
   getSingleStudent,
   deleteStudent,
