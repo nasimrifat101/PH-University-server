@@ -8,15 +8,14 @@ import {
   TStudent,
 } from "./student.Interface";
 
+// Schema for user names
 const userNameSchema = new Schema<TUserName>({
   firstName: { type: String, required: true },
   middleName: { type: String },
-  lastName: {
-    type: String,
-    required: true,
-  },
+  lastName: { type: String, required: true },
 });
 
+// Schema for guardian details
 const guardianSchema = new Schema<TGuardian>({
   fatherName: { type: String, required: true },
   fatherOccupation: { type: String, required: true },
@@ -27,6 +26,7 @@ const guardianSchema = new Schema<TGuardian>({
   address: { type: String, required: true },
 });
 
+// Schema for local guardian details
 const localGuardianSchema = new Schema<TLocalGuardian>({
   name: { type: String, required: true },
   occupation: { type: String, required: true },
@@ -34,22 +34,16 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
   address: { type: String, required: true },
 });
 
+// Schema for student details
 const studentSchema = new Schema<TStudent>({
   id: { type: String, required: true, unique: true },
   password: {
     type: String,
     required: true,
-    maxlength: [20, "password cannot be more than 20 characters long"],
+    maxlength: [20, "Password cannot be more than 20 characters long"],
   },
-  name: {
-    type: userNameSchema,
-    required: true,
-  },
-  gender: {
-    type: String,
-    enum: ["male", "female"],
-    required: true,
-  },
+  name: { type: userNameSchema, required: true },
+  gender: { type: String, enum: ["male", "female"], required: true },
   dateOfBirth: { type: String },
   email: { type: String, required: true, unique: true },
   contactNumber: { type: String, required: true },
@@ -60,51 +54,41 @@ const studentSchema = new Schema<TStudent>({
     type: String,
     enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
   },
-  guardian: {
-    type: guardianSchema,
-    required: true,
-  },
-  localGuardian: {
-    type: localGuardianSchema,
-    required: true,
-  },
+  guardian: { type: guardianSchema, required: true },
+  localGuardian: { type: localGuardianSchema, required: true },
   profileImg: { type: String },
-  isActive: {
-    type: String,
-    enum: ["active", "block"],
-    default: "active",
-  },
-  isDeleted: {
-    type: Boolean,
-    default: false
-  }
+  isActive: { type: String, enum: ["active", "block"], default: "active" },
+  isDeleted: { type: Boolean, default: false },
 });
 
-// pre save middleware
+// Pre-save middleware to hash passwords
 studentSchema.pre("save", async function (next) {
   const user = this;
-  if (user.isModified("password") || user.isNew) {
-    user.password = await bcrypt.hash(
-      user.password,
-      Number(config.bcrypt_salt_rounds)
-    );
-  }
+
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_rounds)
+  );
+
   next();
 });
 
-// post save middleware
+// Post-save middleware to clear the password field
 studentSchema.post("save", function (doc, next) {
-  // console.log("post hook: we saved our data");
   doc.password = "";
   next();
 });
 
-// query middleware
+// Query middleware to exclude deleted students
+studentSchema.pre("find", function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+// Query middleware to exclude deleted students
+studentSchema.pre("findOne", function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
 
-studentSchema.pre('find', function(next){
-  
-
-  next()
-})
-
+// Exporting the Student model
 export const Student = model<TStudent>("Student", studentSchema);

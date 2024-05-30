@@ -42,12 +42,3 @@ export type TStudent = {
   isDeleted: boolean;
 };
 
-export type studentMethod = {
-  isUserExist(id: string): Promise<TStudent>;
-};
-
-export type studentModel = Model<
-  TStudent,
-  Record<string, never>,
-  studentMethod
->;
