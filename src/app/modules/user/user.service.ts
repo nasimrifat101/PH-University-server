@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import config from "../../config";
 import { TStudent } from "../student/student.Interface";
 import { Student } from "../student/student.model";
@@ -20,7 +21,7 @@ const createStudentIntoDB = async (password: string, studentData: TStudent) => {
 
   if (newUser) {
     studentData.id = newUser.id;
-    studentData.user = newUser._id;
+    studentData.user = newUser._id as ObjectId;
 
     console.log("Student data before creation:", studentData);
 
