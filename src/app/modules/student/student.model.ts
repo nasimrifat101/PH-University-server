@@ -1,12 +1,8 @@
 import { Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
 import config from "../../config";
-import {
-  TGuardian,
-  TLocalGuardian,
-  TUserName,
-  TStudent,
-} from "./student.Interface";
+import { TGuardian, TLocalGuardian, TUserName, TStudent } from "./student.Interface";
+
 
 // Schema for user names
 const userNameSchema = new Schema<TUserName>({
@@ -37,51 +33,30 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 // Schema for student details
 const studentSchema = new Schema<TStudent>({
   id: { type: String, required: true, unique: true },
-  user: {
-    type: Schema.Types.ObjectId,
-    required: true,
-    unique: true,
-    ref: "User",
-  },
-  password: {
-    type: String,
-    required: true,
-    maxlength: [20, "Password cannot be more than 20 characters long"],
-  },
+  user: { type: Schema.Types.ObjectId, required: true, unique: true, ref: "User" },
+  password: { type: String, maxlength: [20, "Password cannot be more than 20 characters long"] },
   name: { type: userNameSchema, required: true },
   gender: { type: String, enum: ["male", "female"], required: true },
-  dateOfBirth: { type: String },
+  dateOfBirth: { type: Date },
   email: { type: String, required: true, unique: true },
   contactNumber: { type: String, required: true },
   emergencyContactNumber: { type: String, required: true },
   presentAddress: { type: String, required: true },
   permanentAddress: { type: String, required: true },
-  bloodGroup: {
-    type: String,
-    enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
-  },
+  bloodGroup: { type: String, enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] },
   guardian: { type: guardianSchema, required: true },
   localGuardian: { type: localGuardianSchema, required: true },
   profileImg: { type: String },
-  
   isDeleted: { type: Boolean, default: false },
+}, {
+  timestamps: true,
 });
 
 // Pre-save middleware to hash passwords
 studentSchema.pre("save", async function (next) {
-  const user = this;
-
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_rounds)
-  );
-
-  next();
-});
-
-// Post-save middleware to clear the password field
-studentSchema.post("save", function (doc, next) {
-  doc.password = "";
+  if (this.isModified("password") && this.password) {
+    this.password = await bcrypt.hash(this.password, Number(config.bcrypt_salt_rounds));
+  }
   next();
 });
 
@@ -90,7 +65,7 @@ studentSchema.pre("find", function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
 });
-// Query middleware to exclude deleted students
+
 studentSchema.pre("findOne", function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();

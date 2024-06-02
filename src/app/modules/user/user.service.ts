@@ -5,23 +5,37 @@ import { TUser } from "./user.interface";
 import { User } from "./user.model";
 
 const createStudentIntoDB = async (password: string, studentData: TStudent) => {
-  let userData: Partial<TUser> = {};
+  if (!studentData) {
+    throw new Error("Student data is undefined or null");
+  }
 
-  userData.password = password || (config.default_pass as string);
-  userData.role = "student";
-  userData.id = "20300100001";
+  const userData: Partial<TUser> = {
+    password: password || (config.default_pass as string),
+    role: "student",
+    id: studentData.id || "20300100001", // This should be dynamically generated or fetched
+  };
 
-  //   create a user
+  // Create a user
   const newUser = await User.create(userData);
 
-  if (Object.keys(newUser).length) {
+  if (newUser) {
     studentData.id = newUser.id;
     studentData.user = newUser._id;
 
-    const newStudent = await Student.create(studentData);
-    return newStudent;
-  }
+    console.log("Student data before creation:", studentData);
 
+    try {
+      // Create a new student
+      const newStudent = await Student.create(studentData);
+      console.log("New student created:", newStudent);
+      return newStudent;
+    } catch (error) {
+      console.error("Error creating student:", error);
+      throw error;
+    }
+  } else {
+    throw new Error("Failed to create user");
+  }
 };
 
 export const userServices = {

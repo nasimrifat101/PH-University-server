@@ -1,7 +1,9 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Document } from "mongoose";
+import bcrypt from "bcrypt";
+import config from "../../config";
 import { TUser } from "./user.interface";
 
-const userSchema = new Schema<TUser>(
+const userSchema = new Schema<TUser & Document>(
   {
     id: {
       type: String,
@@ -9,7 +11,7 @@ const userSchema = new Schema<TUser>(
     },
     password: {
       type: String,
-      required: true,
+      required: true, // Ensure password is required
     },
     needsPasswordChange: {
       type: Boolean,
@@ -18,8 +20,8 @@ const userSchema = new Schema<TUser>(
     role: {
       type: String,
       enum: ["admin", "student", "faculty"],
+      required: true,
     },
-
     status: {
       type: String,
       enum: ["in-progress", "block"],
@@ -35,4 +37,22 @@ const userSchema = new Schema<TUser>(
   }
 );
 
-export const User = model<TUser>("User", userSchema);
+userSchema.pre("save", async function (next) {
+  const user = this as TUser & Document;
+
+  if (user.isModified("password")) {
+    try {
+      const saltRounds = Number(config.bcrypt_salt_rounds);
+      if (!saltRounds) {
+        throw new Error("Salt rounds configuration is invalid");
+      }
+      user.password = await bcrypt.hash(user.password, saltRounds);
+    } catch (error: any) {
+      return next(error);
+    }
+  }
+
+  next();
+});
+
+export const User = model<TUser & Document>("User", userSchema);
