@@ -1,7 +1,12 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { userServices } from "./user.service";
+import sendRes from "../../utils/sendRes";
 
-const createStudent = async (req: Request, res: Response): Promise<void> => {
+const createStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { student } = req.body;
     if (!student) {
@@ -13,18 +18,18 @@ const createStudent = async (req: Request, res: Response): Promise<void> => {
     }
     const { password, ...studentData } = student;
 
-    const result = await userServices.createStudentIntoDB(password, studentData as any);
-    res.status(200).json({
+    const result = await userServices.createStudentIntoDB(
+      password,
+      studentData as any
+    );
+    sendRes(res, {
+      statusCode: 201,
       success: true,
-      message: "User created successfully",
+      message: "Student created successfully",
       data: result,
     });
   } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message || "User creation failed",
-      data: err,
-    });
+    next(err);
   }
 };
 
