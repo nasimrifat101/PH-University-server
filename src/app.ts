@@ -1,9 +1,8 @@
 import cors from "cors";
-import express, { Application, Request, Response, NextFunction } from "express";
-import { studentRoutes } from "./app/modules/student/student.route";
-import { userRoutes } from "./app/modules/user/user.routes";
+import express, { Application, Request, Response } from "express";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
+import router from "./app/routes";
 
 const app: Application = express();
 
@@ -15,11 +14,10 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // Applications
-app.use("/api/v1/students", studentRoutes);
-app.use("/api/v1/users", userRoutes);
+app.use("/api/v1", router);
 
 // Error-handling middleware
 app.use(globalErrorHandler);
-app.use(notFound)
+app.use(notFound);
 
 export default app;
