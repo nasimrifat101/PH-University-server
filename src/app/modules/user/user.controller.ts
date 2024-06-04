@@ -1,12 +1,8 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import { userServices } from "./user.service";
 import sendRes from "../../utils/sendRes";
 
-const createStudent = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
+const createStudent: RequestHandler = async (req, res, next): Promise<void> => {
   try {
     const { student } = req.body;
     if (!student) {
