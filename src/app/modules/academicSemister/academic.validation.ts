@@ -5,7 +5,7 @@ import { TAcademicName } from "./academic.interface";
 export const academicValidation = z.object({
   body: z.object({
     name: z.enum([...AcademicName] as [string, ...string[]]),
-    year: z.date(),
+    year: z.string(),
     code: z.enum([...AcademicCode] as [string, ...string[]]),
     startMonth: z.enum([...Months] as [string, ...string[]]),
     endMonth: z.enum([...Months] as [string, ...string[]]),
