@@ -12,10 +12,7 @@ const createDepartment = catchAsync(async (req, res) => {
   });
 });
 
-
-
 const getDepartment = catchAsync(async (req, res) => {
-
   const result = await departmentServices.getDepartmentFromDB();
   sendRes(res, {
     statusCode: 200,
@@ -23,19 +20,24 @@ const getDepartment = catchAsync(async (req, res) => {
     message: "Department created successfully",
     data: result,
   });
-})
+});
 
+const getSingleDepartment = catchAsync(async (req, res) => {
+  const { departmentId } = req.body;
 
-
-
-
-
-
-
-
-
+  const result = await departmentServices.getSingleDepartmentFromDB(
+    departmentId
+  );
+  sendRes(res, {
+    statusCode: 200,
+    success: true,
+    message: "Department created successfully",
+    data: result,
+  });
+});
 
 export const departmentController = {
-    createDepartment,
-    getDepartment
-}
+  createDepartment,
+  getDepartment,
+  getSingleDepartment,
+};
