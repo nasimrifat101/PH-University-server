@@ -14,6 +14,16 @@ const createDepartment = catchAsync(async (req, res) => {
 
 
 
+const getDepartment = catchAsync(async (req, res) => {
+
+  const result = await departmentServices.getDepartmentFromDB();
+  sendRes(res, {
+    statusCode: 200,
+    success: true,
+    message: "Department created successfully",
+    data: result,
+  });
+})
 
 
 
@@ -26,5 +36,6 @@ const createDepartment = catchAsync(async (req, res) => {
 
 
 export const departmentController = {
-    createDepartment
+    createDepartment,
+    getDepartment
 }

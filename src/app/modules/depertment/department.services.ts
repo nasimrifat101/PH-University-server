@@ -1,7 +1,7 @@
 import { TDepartment } from "./department.interface";
 import { departmentModel } from "./department.model";
 
-const getAllDepartment = async () => {
+const getDepartmentFromDB = async () => {
   const result = await departmentModel.find();
   return result;
 };
@@ -11,13 +11,13 @@ const createDepartmentIntoDB = async (payload: TDepartment) => {
   return result;
 };
 
-const getSingleDepartment = async (id: string) => {
+const getSingleDepartmentFromDB = async (id: string) => {
   const result = await departmentModel.findById(id);
   return result;
 };
 
 export const departmentServices = {
   createDepartmentIntoDB,
-  getSingleDepartment,
-  getAllDepartment
+  getSingleDepartmentFromDB,
+  getDepartmentFromDB
 };
